@@ -227,9 +227,9 @@ function Deliverable() {
 }
 
 const PLANS = [
-  { name: 'Free mini-audit', price: '$0', sub: '', body: 'A focused audit of one feature: a scorecard + 3 concrete failure examples + a prioritized fix list. The wedge — no commitment.', feat: false },
-  { name: 'Fixed-scope audit', price: '$1.5k–$4k', sub: 'fixed', body: 'The full engagement: a 50–100 case suite, red-team coverage, the complete scorecard + fix list, and a test suite you keep.', feat: true },
-  { name: 'Regression retainer', price: '$1k–$3k', sub: '/mo', body: 'I freeze your suite and re-run it on every model/prompt change — automated monitoring with a ship/no-ship verdict each time.', feat: false },
+  { name: 'Free mini-audit', price: '$0', sub: '', body: 'A focused audit of one feature: a scorecard + 3 concrete failure examples + a prioritized fix list. The wedge — no commitment.', feat: false, cta: 'Get the free audit', href: 'mailto:abhishekatm1@gmail.com?subject=Free%20reliability%20mini-audit%20request' },
+  { name: 'Fixed-scope audit', price: '$1.5k–$4k', sub: 'fixed', body: 'The full engagement: a 50–100 case suite, red-team coverage, the complete scorecard + fix list, and a test suite you keep.', feat: true, cta: 'Start an audit', href: 'mailto:abhishekatm1@gmail.com?subject=AI%20reliability%20audit%20enquiry' },
+  { name: 'Regression retainer', price: '$1k–$3k', sub: '/mo', body: 'I freeze your suite and re-run it on every model/prompt change — automated monitoring with a ship/no-ship verdict each time.', feat: false, cta: 'Set up a retainer', href: 'mailto:abhishekatm1@gmail.com?subject=Regression%20monitoring%20retainer%20enquiry' },
 ]
 
 function Pricing() {
@@ -242,12 +242,14 @@ function Pricing() {
         <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }} className="grid md:grid-cols-3 gap-5 mt-12">
           {PLANS.map((p) => (
             <motion.div key={p.name} variants={riseItem}
-              className={`rounded-[18px] p-8 border shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] ${p.feat ? 'grad-border bg-raised border-transparent' : 'bg-card border-line'}`}>
-              {p.feat && <span className="inline-block mono text-[11px] uppercase tracking-wider font-semibold px-2.5 py-1 rounded-md bg-accent text-[#04130f] mb-3">Most popular</span>}
+              className={`flex flex-col rounded-[18px] p-8 border shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] ${p.feat ? 'grad-border bg-raised border-transparent' : 'bg-card border-line'}`}>
+              {p.feat
+                ? <span className="self-start mono text-[11px] uppercase tracking-wider font-semibold px-2.5 py-1 rounded-md bg-accent text-[#04130f] mb-3">Most popular</span>
+                : <span className="h-[26px] mb-3" aria-hidden="true" />}
               <div className="text-[17px] text-mid font-medium">{p.name}</div>
               <div className="text-[36px] font-bold tracking-tight mt-2">{p.price}<span className="text-[15px] text-low font-normal"> {p.sub}</span></div>
-              <p className="text-mid text-[14.5px] mt-2.5">{p.body}</p>
-              {p.feat && <MagneticButton href="mailto:abhishekatm1@gmail.com?subject=AI%20reliability%20audit%20enquiry" className="mt-6 w-full justify-center">Start an audit <ArrowRight size={17} /></MagneticButton>}
+              <p className="text-mid text-[14.5px] mt-2.5 mb-7">{p.body}</p>
+              <MagneticButton href={p.href} primary={p.feat} className="mt-auto w-full justify-center">{p.cta} <ArrowRight size={17} /></MagneticButton>
             </motion.div>
           ))}
         </motion.div>
