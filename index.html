@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Assay — Rigorously test the quality of your AI</title>
+<meta name="description" content="Assay runs a structured reliability audit on your LLM feature — agent, chatbot, or RAG — and hands you a scorecard showing exactly where it breaks, with evidence and a prioritized fix list. The first audit is free.">
+<meta property="og:title" content="Assay — Rigorously test the quality of your AI">
+<meta property="og:description" content="Your AI demo works. Production is the part that fails silently. Get a free reliability mini-audit.">
+<meta property="og:type" content="website">
+<!--
+  ▶ BEFORE SHARING: replace the contact email below.
+  Find-and-replace  you@example.com  with your real contact address (it appears in the CTA links).
+  Or swap the mailto: links for a form (Tally / Formspree) when you have one.
+-->
+<style>
+  :root{
+    --paper:#FBFAF6; --panel:#FFFFFF; --ink:#17181C; --muted:#585B63;
+    --line:#E8E3D8; --brass:#B4541F; --brass-soft:#F4E3D5;
+    --pass:#0E5A53; --fail:#B4231F; --pass-bg:#E3EEEC; --fail-bg:#F6E2E1;
+    --maxw:1080px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.serif{font-family:Georgia,"Times New Roman",serif; line-height:1.15; letter-spacing:-.01em}
+  a{color:var(--brass); text-decoration:none}
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 24px}
+  .mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+
+  /* nav */
+  header.nav{position:sticky; top:0; z-index:10; background:rgba(251,250,246,.85);
+    backdrop-filter:blur(8px); border-bottom:1px solid var(--line)}
+  .nav .wrap{display:flex; align-items:center; justify-content:space-between; height:64px}
+  .brand{font-family:Georgia,serif; font-weight:700; font-size:24px; letter-spacing:.02em}
+  .brand .dot{color:var(--brass)}
+  .nav-links a{color:var(--ink); margin-left:22px; font-size:15px; opacity:.8}
+  .nav-links a:hover{opacity:1}
+  @media(max-width:640px){.nav-links a:not(.btn){display:none}}
+
+  .btn{display:inline-block; background:var(--ink); color:#fff !important; padding:12px 20px;
+    border-radius:8px; font-weight:600; font-size:15px; border:1px solid var(--ink);
+    transition:transform .08s ease, background .15s ease}
+  .btn:hover{background:var(--brass); border-color:var(--brass); transform:translateY(-1px)}
+  .btn.lg{padding:15px 26px; font-size:17px}
+  .btn.ghost{background:transparent; color:var(--ink) !important; border-color:var(--line)}
+  .btn.ghost:hover{border-color:var(--ink); background:transparent}
+
+  /* hero */
+  .hero{padding:84px 0 64px}
+  .hero .grid{display:grid; grid-template-columns:1.15fr .85fr; gap:54px; align-items:center}
+  @media(max-width:860px){.hero .grid{grid-template-columns:1fr; gap:36px} .hero{padding:56px 0 40px}}
+  .eyebrow{font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:var(--brass); font-weight:700; margin-bottom:18px}
+  .hero h1{font-size:52px; margin:0 0 20px}
+  @media(max-width:860px){.hero h1{font-size:38px}}
+  .hero p.sub{font-size:19px; color:var(--muted); margin:0 0 28px; max-width:34em}
+  .cta-row{display:flex; gap:14px; flex-wrap:wrap; align-items:center}
+  .reassure{font-size:14px; color:var(--muted); margin-top:18px; max-width:36em}
+
+  /* scorecard preview card */
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    box-shadow:0 18px 40px -28px rgba(20,20,30,.4); overflow:hidden}
+  .card .ct{padding:16px 18px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:center}
+  .card .ct .t{font-weight:700; font-size:14px}
+  .card .ct .g{font-family:Georgia,serif; font-weight:700}
+  .grade{display:inline-block; background:var(--fail-bg); color:var(--fail); border-radius:6px; padding:2px 10px; font-size:13px; font-weight:700; margin-left:8px}
+  .card .body{padding:16px 18px}
+  .row{display:grid; grid-template-columns:118px 1fr 42px; gap:10px; align-items:center; font-size:12.5px; margin:9px 0}
+  .row .lbl{color:var(--muted)}
+  .bar{height:9px; border-radius:5px; background:#EEE9DE; overflow:hidden}
+  .bar > i{display:block; height:100%; border-radius:5px}
+  .pct{text-align:right; font-variant-numeric:tabular-nums; color:var(--muted)}
+  .evi{margin-top:14px; border-top:1px dashed var(--line); padding-top:12px; font-size:12.5px}
+  .evi .tag{color:var(--fail); font-weight:700}
+  .evi .q{display:block; background:#FAF7F1; border-left:3px solid var(--fail); padding:8px 10px; margin:8px 0; color:#3a3b40}
+  .caption{font-size:12px; color:var(--muted); margin-top:10px; text-align:center}
+
+  /* sections */
+  section{padding:64px 0; border-top:1px solid var(--line)}
+  section h2{font-size:34px; margin:0 0 14px}
+  @media(max-width:860px){section h2{font-size:27px}}
+  .lead{font-size:18px; color:var(--muted); max-width:46em; margin:0 0 26px}
+  .cols{display:grid; gap:22px}
+  .c3{grid-template-columns:repeat(3,1fr)}
+  .c2{grid-template-columns:repeat(2,1fr)}
+  @media(max-width:860px){.c3,.c2{grid-template-columns:1fr}}
+  .tile{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:22px}
+  .tile .n{font-family:Georgia,serif; color:var(--brass); font-size:14px; font-weight:700; letter-spacing:.08em}
+  .tile h3{font-size:20px; margin:8px 0 8px}
+  .tile p{margin:0; color:var(--muted); font-size:15px}
+  ul.checks{list-style:none; padding:0; margin:0; display:grid; gap:14px}
+  ul.checks li{padding-left:30px; position:relative; color:#33343a}
+  ul.checks li::before{content:"✓"; position:absolute; left:0; top:0; color:var(--pass); font-weight:700; background:var(--pass-bg); width:21px; height:21px; border-radius:50%; display:grid; place-items:center; font-size:12px}
+  ul.checks li b{color:var(--ink)}
+
+  .problem li{margin:10px 0; color:#33343a}
+  .pull{font-family:Georgia,serif; font-size:23px; line-height:1.4; margin:24px 0 0; padding-left:18px; border-left:3px solid var(--brass)}
+
+  /* pricing */
+  .price{display:grid; grid-template-columns:repeat(3,1fr); gap:20px}
+  @media(max-width:860px){.price{grid-template-columns:1fr}}
+  .plan{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:26px; display:flex; flex-direction:column}
+  .plan.feature{border-color:var(--brass); box-shadow:0 0 0 3px var(--brass-soft)}
+  .plan .pn{font-weight:700; font-size:17px}
+  .plan .pp{font-family:Georgia,serif; font-size:30px; margin:10px 0 4px}
+  .plan .pp small{font-size:14px; color:var(--muted); font-family:inherit}
+  .plan .pd{color:var(--muted); font-size:14px; margin:8px 0 0}
+  .badge{display:inline-block; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--brass); font-weight:700; margin-bottom:6px}
+
+  details{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:0 18px; margin:10px 0}
+  details summary{cursor:pointer; padding:16px 0; font-weight:600; list-style:none; display:flex; justify-content:space-between; align-items:center}
+  details summary::-webkit-details-marker{display:none}
+  details summary::after{content:"+"; color:var(--brass); font-size:22px; font-weight:400}
+  details[open] summary::after{content:"–"}
+  details .a{padding:0 0 18px; color:var(--muted); font-size:15px}
+
+  .final{background:var(--ink); color:#fff; border-radius:16px; padding:48px; text-align:center}
+  .final h2{color:#fff; font-size:34px}
+  .final p{color:#cfd0d4; max-width:40em; margin:12px auto 26px; font-size:17px}
+  .final .btn{background:var(--brass); border-color:var(--brass)}
+  .final .btn:hover{background:#fff; color:var(--ink) !important; border-color:#fff}
+
+  footer{padding:40px 0 60px; color:var(--muted); font-size:14px; text-align:center}
+  footer .brand{font-size:18px; color:var(--ink); display:block; margin-bottom:6px}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <div class="brand">Assay<span class="dot">.</span></div>
+    <nav class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#deliverable">What you get</a>
+      <a href="#pricing">Pricing</a>
+      <a class="btn" href="mailto:you@example.com?subject=Free%20reliability%20mini-audit%20request">Free audit</a>
+    </nav>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero"><div class="wrap"><div class="grid">
+  <div>
+    <div class="eyebrow">AI reliability audits</div>
+    <h1>Your AI demo works. Production is the part that fails silently.</h1>
+    <p class="sub">Assay runs a structured reliability audit on your LLM feature — agent, chatbot, or RAG — and hands you a scorecard that shows exactly where it breaks, with the evidence and a prioritized fix list.</p>
+    <div class="cta-row">
+      <a class="btn lg" href="mailto:you@example.com?subject=Free%20reliability%20mini-audit%20request">Get a free reliability audit →</a>
+      <a class="btn lg ghost" href="#how">See how it works</a>
+    </div>
+    <p class="reassure">No retainer, no sales call to start. I audit your live feature and send a 1-page scorecard with 3 real failures. If it's not useful, you've lost nothing.</p>
+  </div>
+
+  <!-- live-derived scorecard preview -->
+  <div>
+    <div class="card" aria-label="Sample reliability scorecard">
+      <div class="ct">
+        <span class="t mono">support-assistant · reliability scorecard</span>
+        <span class="g">60%<span class="grade">F</span></span>
+      </div>
+      <div class="body mono">
+        <div class="row"><span class="lbl">Hallucination</span><span class="bar"><i style="width:67%;background:var(--brass)"></i></span><span class="pct">67%</span></div>
+        <div class="row"><span class="lbl">Prompt injection</span><span class="bar"><i style="width:100%;background:var(--pass)"></i></span><span class="pct">100%</span></div>
+        <div class="row"><span class="lbl">PII leakage</span><span class="bar"><i style="width:100%;background:var(--pass)"></i></span><span class="pct">100%</span></div>
+        <div class="row"><span class="lbl">Out-of-scope</span><span class="bar"><i style="width:0%;background:var(--fail)"></i></span><span class="pct">0%</span></div>
+        <div class="row"><span class="lbl">Brand / tone</span><span class="bar"><i style="width:50%;background:var(--brass)"></i></span><span class="pct">50%</span></div>
+        <div class="evi">
+          <span class="tag">✗ CRITICAL — fabricated integration</span>
+          <span class="q">“Yes, we integrate with QuickBooks Desktop 2019 out of the box…” <br>— invented; no basis in the product.</span>
+          <span class="lbl">Judge: confidently confirmed an integration it can’t verify.</span>
+        </div>
+      </div>
+    </div>
+    <p class="caption">A real scorecard from the Assay harness. Yours covers your failure modes, with your evidence.</p>
+  </div>
+</div></div></div>
+
+<!-- PROBLEM -->
+<section><div class="wrap">
+  <h2>Why your AI passes review, then breaks in front of customers</h2>
+  <p class="lead">The demo is the easy 80%. You typed three reasonable questions, got three good answers, and shipped. Then production happens:</p>
+  <ul class="problem">
+    <li>A customer pastes an article into the chat and the model <b>follows instructions hidden inside it</b> (prompt injection).</li>
+    <li>Someone asks a benign question and the assistant <b>refuses</b> — or answers something it should have escalated.</li>
+    <li>The RAG answer sounds confident and <b>cites a policy that doesn't exist</b>.</li>
+    <li>The agent calls the wrong tool with bad arguments, <b>loops, and never stops</b>.</li>
+    <li>You swap to a cheaper model, every spot-check still passes — and a <b>regression you can't see</b> quietly degrades a quarter of your answers.</li>
+  </ul>
+  <p class="pull">"It works when I try it" is not a quality signal — it's the absence of one. That's the gap Assay closes.</p>
+</div></section>
+
+<!-- HOW -->
+<section id="how"><div class="wrap">
+  <h2>The reliability audit — three steps, one scorecard</h2>
+  <p class="lead">A documented method, run the same way every time — so results are comparable across runs, versions, and vendors.</p>
+  <div class="cols c3">
+    <div class="tile"><div class="n">STEP 01</div><h3>Map the failure surface</h3><p>I map your feature to a curated failure-mode taxonomy — hallucination, retrieval, refusals, tool use, prompt injection, PII leakage, tone, drift — and design a test suite for the modes that matter to <em>your</em> product, not a generic benchmark.</p></div>
+    <div class="tile"><div class="n">STEP 02</div><h3>Run, red-team & score</h3><p>I run your feature through the suite with two layers of scoring: deterministic checks (system-prompt leak? valid JSON? PII? latency?) plus an LLM-as-judge for the judgment calls — including adversarial injection and jailbreak cases.</p></div>
+    <div class="tile"><div class="n">STEP 03</div><h3>Deliver the scorecard + fix list</h3><p>You get an overall grade, a pass rate per failure mode, the exact failing cases with input/output/why, and a prioritized list of what to fix first. Plain enough for a founder, precise enough for the engineer.</p></div>
+  </div>
+  <p class="pull" style="font-size:19px">Optional retainer: I freeze your suite and re-run it on every model or prompt change — so a swap that silently breaks things gets caught <em>before</em> it ships.</p>
+</div></section>
+
+<!-- DELIVERABLE -->
+<section id="deliverable"><div class="wrap">
+  <h2>The deliverable: a scorecard you can act on Monday</h2>
+  <p class="lead">Not a slide deck of opinions. A concrete, evidence-backed report.</p>
+  <ul class="checks">
+    <li><b>An overall reliability grade and pass rate</b> — one honest number for "is this safe to ship."</li>
+    <li><b>Reliability by failure mode</b> — see <em>where</em> the weakness is, not just that there is one.</li>
+    <li><b>Top failures, with evidence</b> — the exact input, the model's actual output, and why it failed. No "trust me," just receipts.</li>
+    <li><b>A prioritized fix list</b> — ranked by impact and severity, so you fix the dangerous and common things first.</li>
+    <li><b>A ship / no-ship verdict</b> — and, with the retainer, a regression diff between versions.</li>
+    <li><b>Judge trust, stated honestly</b> — I measure judge-vs-human agreement (Cohen's kappa), so scores aren't a black box.</li>
+  </ul>
+  <p class="lead" style="margin-top:22px">You keep the report <em>and</em> the test suite — a permanent regression asset for your team.</p>
+</div></section>
+
+<!-- PROOF -->
+<section><div class="wrap">
+  <h2>A new firm. A serious method.</h2>
+  <div class="cols c2">
+    <div>
+      <p class="lead">I won't pretend to be a 50-person consultancy with a logo wall. So I don't ask you to trust a brand — I ask you to trust the method and the evidence, and I let you check both for free.</p>
+    </div>
+    <div>
+      <ul class="checks">
+        <li><b>The method is the product.</b> A documented failure-mode taxonomy and a repeatable harness — not one engineer ad-libbing test prompts.</li>
+        <li><b>Real eval expertise.</b> Background in LLM evaluation, benchmarking, and the part most skip: validating that an automated judge agrees with humans before anyone trusts its scores.</li>
+        <li><b>The free audit <em>is</em> the proof.</b> You see the rigor on your own product before any money changes hands.</li>
+      </ul>
+    </div>
+  </div>
+</div></section>
+
+<!-- PRICING -->
+<section id="pricing"><div class="wrap">
+  <h2>Simple, fixed-scope pricing. Start at zero.</h2>
+  <p class="lead">No surprise hourly bills. You know the price before you start — and you only go paid if the free audit earns it.</p>
+  <div class="price">
+    <div class="plan">
+      <div class="pn">Free mini-audit</div>
+      <div class="pp">$0</div>
+      <div class="pd">A focused audit of one feature: a scorecard + 3 concrete failure examples + a prioritized fix list. The wedge — no commitment.</div>
+    </div>
+    <div class="plan feature">
+      <div class="badge">Most popular</div>
+      <div class="pn">Fixed-scope audit</div>
+      <div class="pp">$1.5k–$4k <small>fixed</small></div>
+      <div class="pd">The full engagement: a 50–100 case suite across your failure modes, red-team coverage, the complete scorecard + fix list, and a test suite you keep.</div>
+    </div>
+    <div class="plan">
+      <div class="pn">Regression retainer</div>
+      <div class="pp">$1k–$3k <small>/mo</small></div>
+      <div class="pd">I freeze your suite and re-run it on every model/prompt change — automated regression monitoring with a ship/no-ship verdict each time.</div>
+    </div>
+  </div>
+</div></section>
+
+<!-- FAQ -->
+<section><div class="wrap">
+  <h2>Questions</h2>
+  <details><summary>What exactly do you audit?</summary><div class="a">Any LLM-powered feature — a chatbot, a RAG/knowledge assistant, a tool-using agent, or a backend model in a pipeline. I can test a hosted HTTP endpoint, a function in your codebase, or a model directly.</div></details>
+  <details><summary>Do I have to give you production access or data?</summary><div class="a">No production write access, ever. For the free mini-audit I work against your public or staging endpoint with synthetic and adversarial inputs I generate — no customer data required.</div></details>
+  <details><summary>Isn't an LLM judging another LLM unreliable?</summary><div class="a">It is — <em>if you don't check it.</em> I use deterministic checks wherever a question has a hard answer, reserve the LLM judge for genuine judgment calls, and report how much that judge agrees with human labels (Cohen's kappa). A judge nobody validated is worthless; a validated one is leverage.</div></details>
+  <details><summary>How is this different from the evals my team already runs?</summary><div class="a">Most in-house evals are a happy-path set written by the people who built the feature, scored by "looks good to me." Assay brings an outside failure-mode taxonomy, adversarial/red-team cases, a measured judge, and regression monitoring across versions. It's the difference between checking your own homework and an audit.</div></details>
+  <details><summary>How long does it take?</summary><div class="a">The free mini-audit turns around in a few days. A full fixed-scope audit is typically 1–2 weeks depending on failure-mode count and red-team depth — with price and scope agreed before I start.</div></details>
+</div></section>
+
+<!-- FINAL CTA -->
+<section><div class="wrap">
+  <div class="final">
+    <h2>Find out where your AI breaks — before your customers do.</h2>
+    <p>Send a link to your AI feature (or a staging endpoint). In a few days I'll send back a reliability scorecard with three real failures and a prioritized fix list — free, no call required.</p>
+    <a class="btn lg" href="mailto:you@example.com?subject=Free%20reliability%20mini-audit%20request&body=What%20does%20your%20AI%20feature%20do%3F%0ALink%20to%20the%20feature%20or%20endpoint%3A">Get my free reliability mini-audit →</a>
+  </div>
+</div></section>
+
+<footer>
+  <div class="wrap">
+    <span class="brand">Assay<span style="color:var(--brass)">.</span></span>
+    Rigorously test the quality of your AI. · <a href="mailto:you@example.com">you@example.com</a>
+  </div>
+</footer>
+
+</body>
+</html>
