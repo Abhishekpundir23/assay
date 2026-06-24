@@ -11,7 +11,7 @@ import Scorecard from './components/Scorecard'
 import ShaderBg from './components/ShaderBg'
 
 const MAIL = 'mailto:abhishekatm1@gmail.com?subject=Free%20reliability%20mini-audit%20request'
-const SAMPLE_REPORT = './sample-mini-audit-report.pdf'
+const SAMPLE_REPORT = './sample-mini-audit-report.pdf?v=2026-06-24'
 
 function Background() {
   return (<><div className="bg-grid" /><div className="bg-vignette" /><div className="bg-grain" /></>)
