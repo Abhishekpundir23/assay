@@ -11,6 +11,7 @@ import Scorecard from './components/Scorecard'
 import ShaderBg from './components/ShaderBg'
 
 const MAIL = 'mailto:abhishekatm1@gmail.com?subject=Free%20reliability%20mini-audit%20request'
+const SAMPLE_REPORT = './sample-mini-audit-report.pdf'
 
 function Background() {
   return (<><div className="bg-grid" /><div className="bg-vignette" /><div className="bg-grain" /></>)
@@ -222,6 +223,9 @@ function Deliverable() {
               ))}
             </ul>
             <p className="text-[16px] text-mid mt-5">You keep the report <em>and</em> the test suite — a permanent regression asset for your team.</p>
+            <MagneticButton href={SAMPLE_REPORT} target="_blank" rel="noreferrer" primary={false} className="mt-5">
+              View sample report <ArrowRight size={17} />
+            </MagneticButton>
           </Reveal>
         </div>
       </div>

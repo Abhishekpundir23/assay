@@ -31,7 +31,7 @@ export const riseItem = {
 }
 
 // Magnetic CTA — translates toward the cursor, springs back on leave. No-op when reduced motion / touch.
-export function MagneticButton({ href, children, className = '', primary = true }) {
+export function MagneticButton({ href, children, className = '', primary = true, ...props }) {
   const reduce = useReducedMotion()
   const ref = useRef(null)
   function onMove(e) {
@@ -47,6 +47,7 @@ export function MagneticButton({ href, children, className = '', primary = true 
     <a
       ref={ref}
       href={href}
+      {...props}
       onMouseMove={onMove}
       onMouseLeave={onLeave}
       className={`inline-flex items-center gap-2 rounded-xl px-6 py-3.5 font-semibold transition-[transform,box-shadow] duration-150 will-change-transform ${base} ${className}`}
