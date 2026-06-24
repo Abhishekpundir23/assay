@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import {
   ArrowRight, Check, Plus, Crosshair, ShieldCheck, Lock, GitCompare,
@@ -18,9 +18,12 @@ function Background() {
 
 function Nav() {
   const [scrolled, setScrolled] = useState(false)
-  if (typeof window !== 'undefined') {
-    window.onscroll = () => setScrolled(window.scrollY > 40)
-  }
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
   return (
     <header className={`sticky top-0 z-50 transition-colors duration-300 border-b ${scrolled ? 'glass border-line' : 'border-transparent'}`}>
       <div className="max-w-6xl mx-auto px-6 h-[70px] flex items-center justify-between">
@@ -243,16 +246,16 @@ function Proof() {
     <section className="py-28 md:py-32 border-t border-line">
       <div className="max-w-6xl mx-auto px-6">
         <Kicker>Proof</Kicker>
-        <Reveal as="h2" className="text-[clamp(30px,4.2vw,46px)] font-bold tracking-[-0.025em] leading-[1.08]">We ran Assay on a real frontier model.</Reveal>
+        <Reveal as="h2" className="text-[clamp(30px,4.2vw,46px)] font-bold tracking-[-0.025em] leading-[1.08]">A realistic audit artifact, not a promise deck.</Reveal>
         <Reveal className="text-[18px] text-mid max-w-[48em] mt-4">
-          Deployed as a typical finance-app assistant and judged independently by a model from a different lab,
-          it scored <b className="text-ink">83% — Grade C</b>. Here's what slipped:
+          Run against a finance-assistant scenario and judged independently, the harness produced a
+          <b className="text-ink">83% — Grade C</b> result. The value is the evidence trail:
         </Reveal>
         <div className="grid md:grid-cols-2 gap-6 items-start mt-12">
           <Reveal>
             <div className="rounded-[18px] border border-line bg-surface p-7 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
               <div className="flex items-center justify-between mb-5">
-                <span className="mono text-[13px] text-low">a leading frontier model · live audit</span>
+                <span className="mono text-[13px] text-low">finance-assistant scenario · reproducible audit</span>
                 <span className="mono font-semibold px-3 py-1 rounded-lg bg-warn/12 text-warn border border-warn/30">83% · GRADE C</span>
               </div>
               <div className="space-y-3">
@@ -268,7 +271,7 @@ function Proof() {
                   </div>
                 ))}
               </div>
-              <div className="mt-4 pt-3 border-t border-dashed border-line mono text-[12px] text-low">vendor anonymized · real, reproducible output · judge validated</div>
+              <div className="mt-4 pt-3 border-t border-dashed border-line mono text-[12px] text-low">reproducible output · failure-mode scorecard · judge validation ready</div>
             </div>
           </Reveal>
           <div className="space-y-5">
@@ -293,8 +296,8 @@ function Proof() {
 
 const PLANS = [
   { name: 'Free mini-audit', price: '$0', sub: '', body: 'A focused audit of one feature: a scorecard + 3 concrete failure examples + a prioritized fix list. The wedge — no commitment.', feat: false, cta: 'Get the free audit', href: 'mailto:abhishekatm1@gmail.com?subject=Free%20reliability%20mini-audit%20request' },
-  { name: 'Fixed-scope audit', price: '$1.5k–$4k', sub: 'fixed', body: 'The full engagement: a 50–100 case suite, red-team coverage, the complete scorecard + fix list, and a test suite you keep.', feat: true, cta: 'Start an audit', href: 'mailto:abhishekatm1@gmail.com?subject=AI%20reliability%20audit%20enquiry' },
-  { name: 'Regression retainer', price: '$1k–$3k', sub: '/mo', body: 'I freeze your suite and re-run it on every model/prompt change — automated monitoring with a ship/no-ship verdict each time.', feat: false, cta: 'Set up a retainer', href: 'mailto:abhishekatm1@gmail.com?subject=Regression%20monitoring%20retainer%20enquiry' },
+  { name: 'Fixed-scope audit', price: '$3.5k–$7.5k', sub: 'fixed', body: 'The full engagement: a 75–150 case suite, red-team coverage, the complete scorecard + fix list, and a test suite you keep.', feat: true, cta: 'Start an audit', href: 'mailto:abhishekatm1@gmail.com?subject=AI%20reliability%20audit%20enquiry' },
+  { name: 'Regression retainer', price: '$2k–$4k', sub: '/mo', body: 'I freeze your suite and re-run it on model/prompt changes — monitored regression checks with a ship/no-ship verdict.', feat: false, cta: 'Set up a retainer', href: 'mailto:abhishekatm1@gmail.com?subject=Regression%20monitoring%20retainer%20enquiry' },
 ]
 
 function Pricing() {
